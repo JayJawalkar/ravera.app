@@ -44,6 +44,11 @@ dependencies:
   shared_preferences: ^2.5.3
   blurrycontainer: ^2.1.0
   flutter_dotenv: ^6.0.0
+  google_fonts: ^6.3.2
+  crypto: ^3.0.6
+  uuid: ^4.5.1
+  device_info_plus: ^12.1.0
+  package_info_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:
