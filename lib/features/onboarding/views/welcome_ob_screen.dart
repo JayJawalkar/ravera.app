@@ -55,7 +55,7 @@ class WelcomeObScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Spacer(flex: 2),
- 
+
                   // Main Content
                   BlurContainer(
                     height: size.height * 0.42,
@@ -75,9 +75,9 @@ class WelcomeObScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Welcome to Ravera',
+                          'Welcome to Ravvera',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 26,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             letterSpacing: 1.2,
@@ -88,7 +88,7 @@ class WelcomeObScreen extends StatelessWidget {
                         Text(
                           'Your all-in-one fintech companion for smart savings, micro-investments, and financial growth. Start your journey to financial freedom today!',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.white70,
                             height: 1.5,
                           ),

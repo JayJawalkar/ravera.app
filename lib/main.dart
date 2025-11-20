@@ -1,13 +1,28 @@
+// main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ravera/core/supabase_config.dart';
-import 'package:ravera/features/onboarding/views/welcome_ob_screen.dart';
+import 'package:ravera/features/auth/bloc/auth_bloc.dart';
+import 'package:ravera/features/auth/service/auth_service.dart';
+import 'package:ravera/features/auth/views/login_screen.dart';
+import 'package:ravera/features/home/views/home_screen_navigation.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await SupabaseConfig.initialize();
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc(AuthService())..add(AuthInitialize()),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,128 +30,96 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const gold = Color(0xFFFFD700);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: Colors.black87,
-
-        colorScheme: const ColorScheme.dark(
-          primary: Colors.black,
-          onPrimary: Colors.white,
-          secondary: Colors.white,
-          onSecondary: Colors.black,
-          tertiary: gold,
-          onTertiary: Colors.black,
-          surface: Colors.black,
-          onSurface: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: const ColorScheme.light(
+          primary: Colors.white,
+          onPrimary: Colors.black,
+          secondary: Colors.black,
+          onSecondary: Colors.white,
+          tertiary: Colors.black,
+          onTertiary: Colors.white,
+          surface: Colors.white,
+          onSurface: Colors.black,
           error: Colors.red,
           onError: Colors.white,
         ),
-
-        // Apply Google Fonts globally
         textTheme: GoogleFonts.openSansTextTheme(
-          ThemeData.dark().textTheme.apply(
-            bodyColor: Colors.white,
-            displayColor: Colors.white,
+          ThemeData.light().textTheme.apply(
+            bodyColor: Colors.black,
+            displayColor: Colors.black,
           ),
         ),
-
-        // AppBar
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
           elevation: 0,
           titleTextStyle: GoogleFonts.openSans(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
-
-        // Elevated Button
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: gold,
-            foregroundColor: Colors.black,
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
             textStyle: GoogleFonts.openSans(fontWeight: FontWeight.bold),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
           ),
         ),
-
-        // Text Button
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: gold,
-            textStyle: GoogleFonts.openSans(),
-          ),
-        ),
-
-        // Outlined Button
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: gold),
-            foregroundColor: Colors.white,
-            textStyle: GoogleFonts.openSans(),
-          ),
-        ),
-
-        // FAB
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: gold,
-          foregroundColor: Colors.black,
-        ),
-
-        // SnackBar
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: Colors.black,
-          contentTextStyle: GoogleFonts.openSans(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-          actionTextColor: gold,
-          behavior: SnackBarBehavior.floating,
-        ),
-
-        // Input Fields
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.black,
-          labelStyle: GoogleFonts.openSans(color: Colors.white),
-          hintStyle: GoogleFonts.openSans(color: Colors.white70),
+          fillColor: Colors.white,
+          labelStyle: GoogleFonts.openSans(color: Colors.black),
+          hintStyle: GoogleFonts.openSans(color: Colors.black54),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.white),
+            borderSide: const BorderSide(color: Colors.black),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: gold, width: 2),
+            borderSide: const BorderSide(color: Colors.black, width: 2),
           ),
         ),
-
-        // Card
-        cardTheme: CardThemeData(
-          color: Colors.black,
-          shadowColor: Colors.white24,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-
-        // Bottom Navigation Bar
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.black,
-          selectedItemColor: gold,
-          unselectedItemColor: Colors.white70,
-        ),
-
-        dividerTheme: const DividerThemeData(color: gold, thickness: 1),
       ),
-      home: const WelcomeObScreen(),
+
+      home: const AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state is AuthLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (state is AuthSuccess) {
+          return const HomeScreenNavigation(); // <-- NOW USING NAVIGATION
+        } else if (state is AuthOtpSent || state is RegistrationSuccess) {
+          return const LoginScreen();
+        } else {
+          return const LoginScreen();
+        }
+      },
     );
   }
 }

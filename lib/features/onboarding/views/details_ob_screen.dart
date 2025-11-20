@@ -1,6 +1,7 @@
 // details_screen.dart
 import 'package:flutter/material.dart';
 import 'package:ravera/constants/constants.dart';
+import 'package:ravera/features/auth/views/login_screen.dart';
 
 class DetailsObScreen extends StatelessWidget {
   const DetailsObScreen({super.key});
@@ -327,7 +328,12 @@ class DetailsObScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Handle getting started
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginScreen(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
