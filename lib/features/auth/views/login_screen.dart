@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Phone Login'),
-            Tab(text: 'Email Login'),
+            Tab(text: 'Email Login'), 
           ],
         ),
       ),

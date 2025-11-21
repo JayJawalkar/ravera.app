@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ravera/features/home/views/home_screen.dart';
-import 'package:ravera/features/home/views/usage_screen.dart';
+import 'package:ravera/features/portfolio/views/investment_screen.dart';
+import 'package:ravera/features/settings/views/settings_screen.dart';
+import 'package:ravera/features/usage/views/usage_screen.dart'; // Your new home screen
 
 class HomeScreenNavigation extends StatefulWidget {
   const HomeScreenNavigation({super.key});
@@ -13,60 +15,13 @@ class _HomeScreenNavigationState extends State<HomeScreenNavigation> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(), // <-- YOUR REAL HOME SCREEN HERE
-    // Wallet Screen
-    Scaffold(
-      appBar: AppBar(
-        title: const Text('Wallet'),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.account_balance_wallet,
-              size: 80,
-              color: Color(0xFFFFD700),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Your Wallet',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-    // Usage
-    UsageScreen(),
-    // Profile Screen
-    Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.person, size: 80, color: Color(0xFFFFD700)),
-            SizedBox(height: 20),
-            Text(
-              'Your Profile',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
+    const HomeScreen(), // <-- YOUR NEW HOME SCREEN
+    // Stats Screen
+    const UsageScreen(),
+    // Cards Screen
+    const InvestmentsScreen(),
+    // Settings Screen
+    const SettingsScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -77,21 +32,69 @@ class _HomeScreenNavigationState extends State<HomeScreenNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Wallet',
+      bottomNavigationBar: _buildCustomNavigationBar(),
+    );
+  }
+
+  Widget _buildCustomNavigationBar() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(35),
+        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Usage'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
+      ),
+      child: Row(
+        children: [
+          _buildNavItem(Icons.home, 'Home', 0),
+          _buildNavItem(Icons.bar_chart, 'Stats', 1),
+          _buildNavItem(Icons.folder, 'Portfolio', 2),
+          _buildNavItem(Icons.settings, 'Settings', 3),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    final isActive = _selectedIndex == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          decoration: BoxDecoration(
+            color: isActive ? Colors.black : Colors.transparent,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: isActive ? Colors.white : Colors.black54,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: isActive ? Colors.white : Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

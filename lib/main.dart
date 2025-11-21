@@ -7,7 +7,13 @@ import 'package:ravera/core/supabase_config.dart';
 import 'package:ravera/features/auth/bloc/auth_bloc.dart';
 import 'package:ravera/features/auth/service/auth_service.dart';
 import 'package:ravera/features/auth/views/login_screen.dart';
+import 'package:ravera/features/home/bloc/user_bloc.dart';
+import 'package:ravera/features/home/repository/user_profile_repository.dart';
 import 'package:ravera/features/home/views/home_screen_navigation.dart';
+import 'package:ravera/features/portfolio/bloc/investment_bloc.dart';
+import 'package:ravera/features/portfolio/service/coin_dcx_repository.dart';
+import 'package:ravera/features/usage/bloc/usage_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +24,17 @@ Future<void> main() async {
       providers: [
         BlocProvider<AuthBloc>(
           create: (_) => AuthBloc(AuthService())..add(AuthInitialize()),
+        ),
+        BlocProvider<UsageBloc>(create: (_) => UsageBloc()),
+        BlocProvider<UserProfileBloc>(
+          create: (_) => UserProfileBloc(
+            repository: UserProfileRepository(
+              supabase: Supabase.instance.client,
+            ),
+          ),
+        ),
+        BlocProvider<InvestmentBloc>(
+          create: (_) => InvestmentBloc(repository: CoinDCXRepository()),
         ),
       ],
       child: const MyApp(),
