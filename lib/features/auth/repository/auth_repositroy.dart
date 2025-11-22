@@ -40,13 +40,8 @@ class AuthRepositroy {
         } catch (e) {
           retryCount++;
           if (retryCount < maxRetries) {
-            print(
-              "ProfileCreationFailed, retrying .... ($maxRetries attempts:$e)",
-            );
             Future.delayed(const Duration(seconds: 2));
-          } else {
-            print("Max retries reached. Profile creation failed.");
-          }
+          } else {}
         }
       }
     } catch (e) {
@@ -54,7 +49,10 @@ class AuthRepositroy {
     }
   }
 
-  Future<dynamic> signInWithEmail({required email, required password}) async {
+  Future<dynamic> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
     try {
       final resposne = await _supabase.auth.signInWithPassword(
         password: password,
@@ -64,7 +62,7 @@ class AuthRepositroy {
         throw Exception('Sign in failed');
       }
     } catch (e) {
-      print('Error Signing $e');
+      e.toString();
     }
   }
 
@@ -93,7 +91,7 @@ class AuthRepositroy {
         );
       }
     } catch (e) {
-      print("RPC failed $e");
+      e.toString();
     }
   }
 
@@ -104,7 +102,7 @@ class AuthRepositroy {
         authScreenLaunchMode: LaunchMode.externalApplication,
       );
     } catch (e) {
-      print("Error during Google sign-in: $e");
+      e.toString();
     }
   }
 }

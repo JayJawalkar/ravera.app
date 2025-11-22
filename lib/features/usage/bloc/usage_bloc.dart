@@ -4,7 +4,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
-import 'package:usage_stats/usage_stats.dart';
+import 'package:app_usage/app_usage.dart';
+import 'package:android_intent_plus/android_intent.dart';
 
 part 'usage_event.dart';
 part 'usage_state.dart';
@@ -82,17 +83,25 @@ class UsageBloc extends Bloc<UsageEvent, UsageState> {
     try {
       emit(state.copyWith(status: UsageStatus.loading));
 
-      final bool? hasAccess = await UsageStats.checkUsagePermission();
-      final bool permissionGranted = hasAccess ?? false;
+      // Check if usage access permission is granted
+      bool hasPermission = false;
+      try {
+        final DateTime endDate = DateTime.now();
+        final DateTime startDate = endDate.subtract(const Duration(minutes: 1));
+        await AppUsage().getAppUsage(startDate, endDate);
+        hasPermission = true;
+      } catch (e) {
+        hasPermission = false;
+      }
 
-      if (permissionGranted) {
+      if (hasPermission) {
         add(const UsageStatsFetched());
       }
 
       emit(
         state.copyWith(
           status: UsageStatus.permissionChecked,
-          hasPermission: permissionGranted,
+          hasPermission: hasPermission,
         ),
       );
     } catch (e) {
@@ -110,14 +119,20 @@ class UsageBloc extends Bloc<UsageEvent, UsageState> {
     Emitter<UsageState> emit,
   ) async {
     try {
-      await UsageStats.grantUsagePermission();
-      await Future.delayed(const Duration(seconds: 1));
+      // Open usage access settings directly
+      const intent = AndroidIntent(
+        action: 'android.settings.USAGE_ACCESS_SETTINGS',
+      );
+      await intent.launch();
+
+      // Wait for the user to return and check the permission again
+      await Future.delayed(const Duration(seconds: 2));
       add(const UsagePermissionChecked());
     } catch (e) {
       emit(
         state.copyWith(
           status: UsageStatus.error,
-          error: 'Error requesting permission: $e',
+          error: 'Error opening settings: $e',
         ),
       );
     }
@@ -146,7 +161,8 @@ class UsageBloc extends Bloc<UsageEvent, UsageState> {
         _getTimeFrameDuration(state.selectedTimeFrame),
       );
 
-      final List<UsageInfo> usageStats = await UsageStats.queryUsageStats(
+      // Fetch app usage using app_usage package
+      final List<AppUsageInfo> usageStats = await AppUsage().getAppUsage(
         startDate,
         endDate,
       );
@@ -178,37 +194,16 @@ class UsageBloc extends Bloc<UsageEvent, UsageState> {
     }
   }
 
-  Future<List<UsageInfo>> _processUsageStats(List<UsageInfo> usageStats) async {
-    final Map<String, UsageInfo> aggregatedStats = {};
-
-    for (final usage in usageStats) {
-      final packageName = usage.packageName ?? '';
-      if (packageName.isEmpty) continue;
-
-      final totalTime = int.tryParse(usage.totalTimeInForeground ?? '0') ?? 0;
-      if (totalTime == 0) continue;
-
-      if (aggregatedStats.containsKey(packageName)) {
-        final existing = aggregatedStats[packageName]!;
-        final existingTime =
-            int.tryParse(existing.totalTimeInForeground ?? '0') ?? 0;
-        aggregatedStats[packageName] = UsageInfo(
-          packageName: packageName,
-          totalTimeInForeground: (existingTime + totalTime).toString(),
-        );
-      } else {
-        aggregatedStats[packageName] = usage;
-      }
-    }
-
-    final filteredStats = aggregatedStats.values.toList();
+  Future<List<AppUsageInfo>> _processUsageStats(
+    List<AppUsageInfo> usageStats,
+  ) async {
+    // Filter out apps with zero usage
+    final filteredStats = usageStats
+        .where((usage) => usage.usage.inMilliseconds > 0)
+        .toList();
 
     // Sort by usage time (descending)
-    filteredStats.sort((a, b) {
-      final timeA = int.tryParse(a.totalTimeInForeground ?? '0') ?? 0;
-      final timeB = int.tryParse(b.totalTimeInForeground ?? '0') ?? 0;
-      return timeB.compareTo(timeA);
-    });
+    filteredStats.sort((a, b) => b.usage.compareTo(a.usage));
 
     // Load app info for top apps
     await _loadAppIcons(filteredStats.take(15).toList());
@@ -216,9 +211,9 @@ class UsageBloc extends Bloc<UsageEvent, UsageState> {
     return filteredStats;
   }
 
-  Future<void> _loadAppIcons(List<UsageInfo> usageList) async {
+  Future<void> _loadAppIcons(List<AppUsageInfo> usageList) async {
     final packagesToFetch = usageList
-        .map((usage) => usage.packageName ?? '')
+        .map((usage) => usage.packageName)
         .where(
           (packageName) =>
               packageName.isNotEmpty && !_appInfoCache.containsKey(packageName),
@@ -233,7 +228,6 @@ class UsageBloc extends Bloc<UsageEvent, UsageState> {
         }
       } catch (e) {
         // Silent fail - we'll use default icon
-        print('Error loading app info for $packageName: $e');
       }
     }
   }
@@ -250,18 +244,18 @@ class UsageBloc extends Bloc<UsageEvent, UsageState> {
     }
   }
 
-  int _calculateTotalUsageTime(List<UsageInfo> usageStats) {
+  int _calculateTotalUsageTime(List<AppUsageInfo> usageStats) {
     return usageStats.fold(0, (total, usage) {
-      return total + (int.tryParse(usage.totalTimeInForeground ?? '0') ?? 0);
+      return total + usage.usage.inMilliseconds;
     });
   }
 
-  Map<String, int> _calculateCategoryBreakdown(List<UsageInfo> usageStats) {
+  Map<String, int> _calculateCategoryBreakdown(List<AppUsageInfo> usageStats) {
     final Map<String, int> categoryTimes = {};
 
     for (final usage in usageStats) {
-      final category = _getAppCategory(usage.packageName ?? '');
-      final time = int.tryParse(usage.totalTimeInForeground ?? '0') ?? 0;
+      final category = _getAppCategory(usage.packageName);
+      final time = usage.usage.inMilliseconds;
       categoryTimes[category] = (categoryTimes[category] ?? 0) + time;
     }
 

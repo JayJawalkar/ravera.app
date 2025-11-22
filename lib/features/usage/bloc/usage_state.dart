@@ -5,7 +5,7 @@ enum UsageStatus { initial, loading, permissionChecked, success, error }
 
 class UsageState extends Equatable {
   final UsageStatus status;
-  final List<UsageInfo> usageStats;
+  final List<AppUsageInfo> usageStats;
   final bool hasPermission;
   final String selectedTimeFrame;
   final String? error;
@@ -38,7 +38,7 @@ class UsageState extends Equatable {
 
   UsageState copyWith({
     UsageStatus? status,
-    List<UsageInfo>? usageStats,
+    List<AppUsageInfo>? usageStats,
     bool? hasPermission,
     String? selectedTimeFrame,
     String? error,

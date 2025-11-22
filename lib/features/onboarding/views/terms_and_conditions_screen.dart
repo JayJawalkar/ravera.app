@@ -1,72 +1,72 @@
 // terms_conditions_screen.dart
 import 'package:flutter/material.dart';
 import 'package:ravera/constants/image/image_constants.dart';
-import 'package:ravera/constants/ui/blur_container.dart';
 import 'package:ravera/features/onboarding/views/details_ob_screen.dart';
+import 'package:ravera/features/onboarding/views/welcome_ob_screen.dart';
 
-class TermsAndConditionsScreen extends StatelessWidget {
+class TermsAndConditionsScreen extends StatefulWidget {
   const TermsAndConditionsScreen({super.key});
+
+  @override
+  State<TermsAndConditionsScreen> createState() =>
+      _TermsAndConditionsScreenState();
+}
+
+class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _waveController;
+
+  @override
+  void initState() {
+    super.initState();
+    _waveController = AnimationController(
+      duration: const Duration(seconds: 30),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _waveController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'Terms & Conditions',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0F0F0F), Color(0xFF1A1A1A), Color(0xFF0A0A0A)],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Background elements
-            Positioned(
-              top: 100,
-              left: -50,
-              child: BlurContainer(
-                height: 150,
-                width: 150,
-                blur: 20,
-                bgColor: const Color(0xFFFFD700).withAlpha(20),
-                radius: 75,
-                child: const SizedBox(),
-              ),
-            ),
-            Positioned(
-              bottom: 100,
-              right: -30,
-              child: BlurContainer(
-                height: 120,
-                width: 120,
-                blur: 15,
-                bgColor: const Color(0xFFFFFFFF).withAlpha(15),
-                radius: 60,
-                child: const SizedBox(),
-              ),
-            ),
+      body: Stack(
+        children: [
+          // Animated Wave Background
+          _buildWaveBackground(),
 
-            Padding(
+          // Main Content
+          SafeArea(
+            child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  BlurContainer(
+                  Container(
                     height: height * 0.7,
                     width: double.infinity,
-                    blur: 15,
-                    bgColor: Colors.white.withAlpha(10),
-                    radius: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(185),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.black.withAlpha(22)),
+                    ),
                     padding: const EdgeInsets.all(24),
                     child: SingleChildScrollView(
                       child: Column(
@@ -76,6 +76,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
                             ImageConstants.notscam,
                             height: height * 0.25,
                             width: double.infinity,
+                            fit: BoxFit.contain,
                           ),
                           _buildSectionTitle('1. Account Terms'),
                           _buildSectionContent(
@@ -128,10 +129,16 @@ class TermsAndConditionsScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            side: BorderSide(
+                              color: Colors.black.withAlpha(86),
+                            ),
                           ),
                           child: Text(
                             'Decline',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
@@ -147,6 +154,8 @@ class TermsAndConditionsScreen extends StatelessWidget {
                             );
                           },
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -163,9 +172,24 @@ class TermsAndConditionsScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildWaveBackground() {
+    return AnimatedBuilder(
+      animation: _waveController,
+      builder: (context, child) {
+        return CustomPaint(
+          size: Size(
+            MediaQuery.of(context).size.width,
+            MediaQuery.of(context).size.height,
+          ),
+          painter: OnboardingWavePainter(_waveController.value),
+        );
+      },
     );
   }
 
@@ -175,7 +199,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
       style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: const Color(0xFFFFD700),
+        color: Colors.black,
       ),
     );
   }
@@ -183,7 +207,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
   Widget _buildSectionContent(String content) {
     return Text(
       content,
-      style: TextStyle(fontSize: 14, color: Colors.white70, height: 1.6),
+      style: TextStyle(fontSize: 14, color: Colors.black54, height: 1.6),
     );
   }
 }

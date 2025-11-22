@@ -1,6 +1,8 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ravera/features/auth/bloc/auth_bloc.dart';
+import 'package:ravera/features/onboarding/views/splash_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -87,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black.withOpacity(0.1)),
+              border: Border.all(color: Colors.black.withAlpha(22)),
               borderRadius: BorderRadius.circular(20),
             ),
             child: IconButton(
@@ -181,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Colors.black.withOpacity(0.6),
+          color: Colors.black.withAlpha(172),
           letterSpacing: 1.0,
         ),
       ),
@@ -191,23 +193,20 @@ class _SettingsScreenState extends State<SettingsScreen>
   Widget _buildSettingsCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withAlpha(174),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withAlpha(22)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: const ColorFilter.mode(Colors.transparent, BlendMode.srcOver),
-          child: Column(children: children),
-        ),
+        child: Column(children: children),
       ),
     );
   }
 
   Widget _buildSettingItem({required IconData icon, required String title}) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black.withOpacity(0.8)),
+      leading: Icon(icon, color: Colors.black.withAlpha(194)),
       title: Text(
         title,
         style: const TextStyle(
@@ -215,7 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           color: Colors.black,
         ),
       ),
-      trailing: Icon(Icons.chevron_right, color: Colors.black.withOpacity(0.4)),
+      trailing: Icon(Icons.chevron_right, color: Colors.black.withAlpha(110)),
       onTap: () {},
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       minLeadingWidth: 0,
@@ -226,34 +225,113 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Divider(
       height: 1,
       thickness: 1,
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withAlpha(22),
     );
   }
 
   Widget _buildLogoutButton() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
-      ),
-      child: ListTile(
-        leading: Icon(
-          Icons.logout_outlined,
-          color: Colors.black.withOpacity(0.8),
-        ),
-        title: const Text(
-          'Logout',
-          style: TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
-        ),
-        onTap: () {},
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      ),
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        // Handle different states after logout attempt
+        if (state is AuthUnauthenticated) {
+          // Successfully logged out
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successfully logged out'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Navigate to SplashScreen and remove all routes
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const SplashScreen()),
+            (route) => false,
+          );
+        } else if (state is AuthFailure) {
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Logout failed: ${state.error}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is AuthLoading;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha(184),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.black.withAlpha(22)),
+          ),
+          child: ListTile(
+            leading: isLoading
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.black.withAlpha(194),
+                      ),
+                    ),
+                  )
+                : Icon(
+                    Icons.logout_outlined,
+                    color: Colors.black.withAlpha(192),
+                  ),
+            title: Text(
+              'Logout',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            onTap: isLoading
+                ? null
+                : () {
+                    // Show confirmation dialog before logging out
+                    _showLogoutConfirmationDialog(context);
+                  },
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Dispatch logout event
+                context.read<AuthBloc>().add(AuthSignOut());
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
-// In your settings_screen.dart, just update the WavePainter to use the same drawing method:
 class WavePainter extends CustomPainter {
   final double animationValue;
 
@@ -262,17 +340,20 @@ class WavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint1 = Paint()
-      ..color = Colors.black.withOpacity(0.2)
+      ..color = Colors.black
+          .withAlpha(22) // Reduced opacity for better readability
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
     final paint2 = Paint()
-      ..color = Colors.black.withOpacity(0.25)
+      ..color = Colors.black
+          .withAlpha(18) // Reduced opacity
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
     final paint3 = Paint()
-      ..color = Colors.black.withOpacity(0.15)
+      ..color = Colors.black
+          .withAlpha(14) // Reduced opacity
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 

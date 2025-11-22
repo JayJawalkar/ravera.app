@@ -52,7 +52,7 @@ class InvestmentBloc extends Bloc<InvestmentEvent, InvestmentState> {
       emit(InvestmentLoaded(investments: investments, lastUpdated: timestamp));
     } catch (e) {
       // Silently fail for background updates to avoid disrupting UI
-      print('Real-time update failed: $e');
+     
       // Keep the current state, just update timestamp to show attempt
       if (state is InvestmentLoaded) {
         final currentState = state as InvestmentLoaded;

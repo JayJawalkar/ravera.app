@@ -28,8 +28,10 @@ class _HomeScreenNavigationState extends State<HomeScreenNavigation> {
     setState(() => _selectedIndex = index);
   }
 
+  // In home_screen_navigation.dart, add this to verify
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: _buildCustomNavigationBar(),
@@ -43,10 +45,10 @@ class _HomeScreenNavigationState extends State<HomeScreenNavigation> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(35),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withAlpha(22)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(8),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),

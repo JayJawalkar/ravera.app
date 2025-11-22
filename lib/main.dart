@@ -10,6 +10,7 @@ import 'package:ravera/features/auth/views/login_screen.dart';
 import 'package:ravera/features/home/bloc/user_bloc.dart';
 import 'package:ravera/features/home/repository/user_profile_repository.dart';
 import 'package:ravera/features/home/views/home_screen_navigation.dart';
+import 'package:ravera/features/onboarding/views/splash_screen.dart';
 import 'package:ravera/features/portfolio/bloc/investment_bloc.dart';
 import 'package:ravera/features/portfolio/service/coin_dcx_repository.dart';
 import 'package:ravera/features/usage/bloc/usage_bloc.dart';
@@ -106,7 +107,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: const AuthWrapper(),
+      home: const SplashScreen(),
     );
   }
 }
@@ -130,7 +131,7 @@ class AuthWrapper extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         } else if (state is AuthSuccess) {
-          return const HomeScreenNavigation(); // <-- NOW USING NAVIGATION
+          return const HomeScreenNavigation();
         } else if (state is AuthOtpSent || state is RegistrationSuccess) {
           return const LoginScreen();
         } else {

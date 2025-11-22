@@ -98,35 +98,32 @@ class _UsageViewState extends State<_UsageView>
   }
 
   Widget _buildAppBar() {
-    return Container(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Digital Insights',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Digital Insights',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
             ),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withOpacity(0.1)),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.search, size: 20),
-                onPressed: () {},
-              ),
+          ),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black.withAlpha(22)),
+              borderRadius: BorderRadius.circular(20),
             ),
-          ],
-        ),
+            child: IconButton(
+              icon: const Icon(Icons.search, size: 20),
+              onPressed: () {},
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -198,26 +195,25 @@ class UsageWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint1 = Paint()
-      ..color = Colors.black.withOpacity(0.15)
+      ..color = Colors.black.withAlpha(14)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
     final paint2 = Paint()
-      ..color = Colors.black.withOpacity(0.12)
+      ..color = Colors.black.withAlpha(24)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
     final paint3 = Paint()
-      ..color = Colors.black.withOpacity(0.08)
+      ..color = Colors.black.withAlpha(19)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 
     final paint4 = Paint()
-      ..color = Colors.black.withOpacity(0.1)
+      ..color = Colors.black.withAlpha(22)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
-    // First wave - slow (same timing as other screens)
     _drawWave(
       canvas,
       size,
@@ -226,8 +222,6 @@ class UsageWavePainter extends CustomPainter {
       0.15,
       waveHeight: 40,
     );
-
-    // Second wave - medium (same timing as other screens)
     _drawWave(
       canvas,
       size,
@@ -236,8 +230,6 @@ class UsageWavePainter extends CustomPainter {
       0.3,
       waveHeight: 30,
     );
-
-    // Third wave - fast (same timing as other screens)
     _drawWave(
       canvas,
       size,
@@ -246,8 +238,6 @@ class UsageWavePainter extends CustomPainter {
       0.45,
       waveHeight: 50,
     );
-
-    // Fourth wave - medium speed
     _drawWave(
       canvas,
       size,
@@ -268,7 +258,6 @@ class UsageWavePainter extends CustomPainter {
   }) {
     final path = Path();
     final baseY = size.height * verticalPosition;
-
     path.moveTo(0, baseY);
 
     for (double x = 0; x <= size.width; x += 5) {
@@ -310,9 +299,9 @@ class _TimeFrameSelectorShimmer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withAlpha(175),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withAlpha(22)),
       ),
       child: Row(
         children: List.generate(
@@ -347,9 +336,9 @@ class _UsageGraphShimmer extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withAlpha(184),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withAlpha(22)),
       ),
       child: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
@@ -408,32 +397,9 @@ class _StatsRowShimmer extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withAlpha(183),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(width: 80, height: 16, color: Colors.white),
-                    const SizedBox(height: 8),
-                    Container(width: 60, height: 24, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  border: Border.all(color: Colors.black.withAlpha(22)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,9 +437,9 @@ class _AppUsageBreakdownShimmer extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withAlpha(4),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  border: Border.all(color: Colors.black.withAlpha(22)),
                 ),
                 child: Row(
                   children: [
@@ -541,9 +507,9 @@ class _TimeFrameSelector extends StatelessWidget {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withAlpha(184),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black.withOpacity(0.1)),
+            border: Border.all(color: Colors.black.withAlpha(22)),
           ),
           child: Row(
             children: ['Day', 'Week', 'Month'].map((timeFrame) {
@@ -607,9 +573,9 @@ class _UsageGraph extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withAlpha(184),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.black.withOpacity(0.1)),
+            border: Border.all(color: Colors.black.withAlpha(22)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -785,9 +751,9 @@ class _StatsRow extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withAlpha(182),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.black.withOpacity(0.1)),
+                    border: Border.all(color: Colors.black.withAlpha(22)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -800,7 +766,7 @@ class _StatsRow extends StatelessWidget {
                       Text(
                         _formatDuration(averagePerApp),
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.black,
                         ),
@@ -814,9 +780,9 @@ class _StatsRow extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withAlpha(184),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.black.withOpacity(0.1)),
+                    border: Border.all(color: Colors.black.withAlpha(22)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -829,7 +795,7 @@ class _StatsRow extends StatelessWidget {
                       Text(
                         mostUsedCategory,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: _getCategoryColor(mostUsedCategory),
                         ),
@@ -887,11 +853,9 @@ class _AppUsageBreakdown extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               ...state.usageStats.take(6).map((usage) {
-                final totalTime =
-                    int.tryParse(usage.totalTimeInForeground ?? '0') ?? 0;
                 return _AppUsageItem(
-                  packageName: usage.packageName ?? '',
-                  totalTime: totalTime,
+                  packageName: usage.packageName,
+                  totalTime: usage.usage.inMilliseconds,
                 );
               }),
             ],
@@ -916,9 +880,9 @@ class _AppUsageItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withAlpha(184),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withAlpha(22)),
       ),
       child: Row(
         children: [
@@ -958,7 +922,6 @@ class _AppUsageItem extends StatelessWidget {
   }
 
   String _getAppCategory(UsageBloc bloc, String packageName) {
-    // Use the bloc's category detection
     return bloc.getAppCategory(packageName);
   }
 }
@@ -972,7 +935,6 @@ class _AppIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<UsageBloc, UsageState>(
       builder: (context, state) {
-        // Check if we have app info in the state's cache
         if (state.appInfoCache.containsKey(packageName)) {
           final app = state.appInfoCache[packageName] as AppInfo?;
           if (app?.icon != null) {

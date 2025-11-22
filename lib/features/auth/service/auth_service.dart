@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ravera/features/auth/service/local_storage_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -19,68 +20,36 @@ class AuthService {
   static const String _sessionKey = 'supabase_session';
 
   // Email & Password Authentication
+  // Add these methods to your existing AuthService class
+
   Future<Map<String, dynamic>> registerWithEmail({
     required String email,
     required String password,
     required String fullName,
-    String? phoneNumber,
+    required String phoneNumber,
   }) async {
     try {
-      final deviceId = await getDeviceId();
-
-      final AuthResponse authResponse = await _supabase.auth.signUp(
+      final response = await _supabase.auth.signUp(
         email: email,
         password: password,
-        data: {
-          'full_name': fullName,
-          'phone': phoneNumber,
-          'device_id': deviceId,
-        },
+        data: {'full_name': fullName, 'phone': phoneNumber},
       );
 
-      if (authResponse.user != null) {
-        // Create user profile
-        await _createUserProfile(
-          authResponse.user!,
-          email: email,
-          phone: phoneNumber,
-          fullName: fullName,
-          deviceId: deviceId,
-        );
-
-        await _logAuthEvent(
-          authResponse.user!.id,
-          'email_register_success',
-          deviceId,
-          extraData: {'email': email},
-        );
-
+      if (response.user != null) {
         return {
           'success': true,
-          'user': authResponse.user,
-          'message':
-              'Registration successful. Please check your email for verification.',
+          'user': response.user,
+          'message': 'Registration successful',
         };
       } else {
-        return {
-          'success': false,
-          'message': 'Registration failed. Please try again.',
-        };
+        return {'success': false, 'message': 'Registration failed'};
       }
     } catch (e) {
-      final errorMessage = _getEmailErrorMessage(e);
-
-      await _logAuthEvent(
-        null,
-        'email_register_failed',
-        await getDeviceId(),
-        extraData: {'error': e.toString(), 'email': email},
-      );
-
-      return {'success': false, 'message': errorMessage, 'error': e.toString()};
+      return {'success': false, 'message': e.toString()};
     }
   }
 
+  // In your AuthService class, update the signInWithEmail method
   Future<Map<String, dynamic>> signInWithEmail({
     required String email,
     required String password,
@@ -92,13 +61,25 @@ class AuthService {
         email: email,
         password: password,
       );
+      if (authResponse.user != null && authResponse.session != null) {
+        // Store the session properly
+        await _storeSession(authResponse.session!);
 
-      if (authResponse.user != null) {
-        // Update user profile
+        // Check if profile exists, if not create it
+        await _supabase
+            .from('user_profiles')
+            .select()
+            .eq('id', authResponse.user!.id)
+            .single()
+            .catchError((_) => null);
+
+        // Profile exists, update it
         await _updateUserProfile(authResponse.user!, deviceId);
 
-        // Create session record
         await _createUserSession(authResponse.user!, deviceId);
+
+        // Set user as logged in
+        await LocalStorageService().setUserLoggedIn(true);
 
         await _logAuthEvent(
           authResponse.user!.id,
@@ -106,6 +87,9 @@ class AuthService {
           deviceId,
           extraData: {'email': email},
         );
+
+        // Verify session was stored
+      await getCurrentSession();
 
         return {
           'success': true,
@@ -118,7 +102,6 @@ class AuthService {
       }
     } catch (e) {
       final errorMessage = _getEmailErrorMessage(e);
-
       await _logAuthEvent(
         null,
         'email_login_failed',
@@ -127,6 +110,39 @@ class AuthService {
       );
 
       return {'success': false, 'message': errorMessage, 'error': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> signOut() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      final deviceId = await getDeviceId();
+
+      if (user != null) {
+        await _logAuthEvent(user.id, 'logout', deviceId);
+        await _supabase
+            .from('user_sessions')
+            .update({
+              'is_revoked': true,
+              'revoked_at': DateTime.now().toUtc().toIso8601String(),
+            })
+            .eq('user_id', user.id)
+            .eq('device_id', deviceId);
+      }
+
+      await _supabase.auth.signOut();
+      await _secureStorage.delete(key: _sessionKey);
+
+      // Clear login state
+      await LocalStorageService().setUserLoggedIn(false);
+
+      return {'success': true, 'message': 'Signed out successfully'};
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Sign out failed: $e',
+        'error': e.toString(),
+      };
     }
   }
 
@@ -228,9 +244,15 @@ class AuthService {
     required String deviceId,
   }) async {
     try {
+      // Use email from user object if not provided
+      final userEmail = email ?? user.email;
+
+      if (userEmail == null) {
+      }
+
       await _supabase.from('user_profiles').upsert({
         'id': user.id,
-        'email': email,
+        'email': userEmail, // This can't be null due to DB constraint
         'phone': phone,
         'full_name': fullName,
         'is_email_verified': user.emailConfirmedAt != null,
@@ -239,7 +261,8 @@ class AuthService {
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (e) {
-      print('Error creating user profile: $e');
+      e.toString();
+      rethrow;
     }
   }
 
@@ -247,12 +270,13 @@ class AuthService {
     try {
       await _supabase.from('user_profiles').upsert({
         'id': user.id,
+        'email': user.email, // Add this line - email is required
         'is_email_verified': user.emailConfirmedAt != null,
         'last_login': DateTime.now().toUtc().toIso8601String(),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (e) {
-      print('Error updating user profile: $e');
+      e.toString();
     }
   }
 
@@ -395,7 +419,7 @@ class AuthService {
         'created_at': DateTime.now().toUtc().toIso8601String(),
       });
     } catch (e) {
-      print('Error creating user session: $e');
+      e.toString();
     }
   }
 
@@ -433,36 +457,6 @@ class AuthService {
     return expiryDate.isAfter(DateTime.now());
   }
 
-  Future<Map<String, dynamic>> signOut() async {
-    try {
-      final user = _supabase.auth.currentUser;
-      final deviceId = await getDeviceId();
-
-      if (user != null) {
-        await _logAuthEvent(user.id, 'logout', deviceId);
-        await _supabase
-            .from('user_sessions')
-            .update({
-              'is_revoked': true,
-              'revoked_at': DateTime.now().toUtc().toIso8601String(),
-            })
-            .eq('user_id', user.id)
-            .eq('device_id', deviceId);
-      }
-
-      await _supabase.auth.signOut();
-      await _secureStorage.delete(key: _sessionKey);
-
-      return {'success': true, 'message': 'Signed out successfully'};
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'Sign out failed: $e',
-        'error': e.toString(),
-      };
-    }
-  }
-
   Future<void> _logAuthEvent(
     String? userId,
     String eventType,
@@ -480,7 +474,7 @@ class AuthService {
 
       await _supabase.from('auth_audit_logs').insert(logData);
     } catch (e) {
-      print('Error logging auth event: $e');
+      e.toString();
     }
   }
 

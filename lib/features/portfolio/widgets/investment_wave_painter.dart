@@ -10,17 +10,17 @@ class InvestmentsWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint1 = Paint()
-      ..color = Colors.black.withOpacity(0.1)
+      ..color = Colors.black.withAlpha(22)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
     final paint2 = Paint()
-      ..color = Colors.black.withOpacity(0.08)
+      ..color = Colors.black.withAlpha(15)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
     final paint3 = Paint()
-      ..color = Colors.black.withOpacity(0.05)
+      ..color = Colors.black.withAlpha(6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 

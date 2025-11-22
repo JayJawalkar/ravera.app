@@ -1,55 +1,49 @@
 // welcome_ob_screen.dart
-import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:ravera/constants/constants.dart';
 import 'package:ravera/features/onboarding/views/terms_and_conditions_screen.dart';
 
-class WelcomeObScreen extends StatelessWidget {
+class WelcomeObScreen extends StatefulWidget {
   const WelcomeObScreen({super.key});
+
+  @override
+  State<WelcomeObScreen> createState() => _WelcomeObScreenState();
+}
+
+class _WelcomeObScreenState extends State<WelcomeObScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _waveController;
+
+  @override
+  void initState() {
+    super.initState();
+    _waveController = AnimationController(
+      duration: const Duration(seconds: 30),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _waveController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0F0F0F), Color(0xFF1A1A1A), Color(0xFF0A0A0A)],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Background decorative elements
-            Positioned(
-              top: -50,
-              right: -30,
-              child: BlurContainer(
-                height: 200,
-                width: 200,
-                blur: 25,
-                bgColor: const Color(0xFFFFD700).withAlpha(30),
-                radius: 100,
-                child: const SizedBox(),
-              ),
-            ),
-            Positioned(
-              bottom: -80,
-              left: -40,
-              child: BlurContainer(
-                height: 250,
-                width: 250,
-                blur: 20,
-                bgColor: const Color(0xFFFFFFFF).withAlpha(20),
-                radius: 125,
-                child: const SizedBox(),
-              ),
-            ),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // Animated Wave Background
+          _buildWaveBackground(),
 
-            Padding(
+          // Main Content
+          SafeArea(
+            child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -57,13 +51,14 @@ class WelcomeObScreen extends StatelessWidget {
                   const Spacer(flex: 2),
 
                   // Main Content
-                  BlurContainer(
+                  Container(
                     height: size.height * 0.42,
                     width: size.width * 0.85,
-                    blur: 15,
-                    bgColor: Colors.white.withAlpha(15),
-                    shadowColor: Colors.black.withAlpha(100),
-                    radius: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(184),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.black.withAlpha(22)),
+                    ),
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -75,11 +70,11 @@ class WelcomeObScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Welcome to Ravvera',
+                          'Welcome to Ravera',
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black,
                             letterSpacing: 1.2,
                           ),
                           textAlign: TextAlign.center,
@@ -89,7 +84,7 @@ class WelcomeObScreen extends StatelessWidget {
                           'Your all-in-one fintech companion for smart savings, micro-investments, and financial growth. Start your journey to financial freedom today!',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white70,
+                            color: Colors.black54,
                             height: 1.5,
                           ),
                           textAlign: TextAlign.center,
@@ -134,6 +129,8 @@ class WelcomeObScreen extends StatelessWidget {
                             );
                           },
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -146,7 +143,7 @@ class WelcomeObScreen extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ).blurry(blur: 3, color: Colors.transparent),
+                        ),
                       ),
                     ],
                   ),
@@ -155,9 +152,24 @@ class WelcomeObScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildWaveBackground() {
+    return AnimatedBuilder(
+      animation: _waveController,
+      builder: (context, child) {
+        return CustomPaint(
+          size: Size(
+            MediaQuery.of(context).size.width,
+            MediaQuery.of(context).size.height,
+          ),
+          painter: OnboardingWavePainter(_waveController.value),
+        );
+      },
     );
   }
 }
@@ -170,23 +182,25 @@ class _FeatureChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlurContainer(
+    return Container(
       height: 80,
       width: 80,
-      blur: 10,
-      bgColor: Colors.white.withAlpha(10),
-      radius: 16,
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(185),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black.withAlpha(22)),
+      ),
       padding: const EdgeInsets.all(8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: const Color(0xFFFFD700), size: 24),
+          Icon(icon, color: Colors.black, size: 24),
           const SizedBox(height: 6),
           Text(
             text,
             style: TextStyle(
               fontSize: 10,
-              color: Colors.white70,
+              color: Colors.black54,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
@@ -195,5 +209,85 @@ class _FeatureChip extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class OnboardingWavePainter extends CustomPainter {
+  final double animationValue;
+
+  OnboardingWavePainter(this.animationValue);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint1 = Paint()
+      ..color = Colors.black.withAlpha(22)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    final paint2 = Paint()
+      ..color = Colors.black.withAlpha(8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    final paint3 = Paint()
+      ..color = Colors.black.withAlpha(5)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    // First wave - slow
+    _drawWave(
+      canvas,
+      size,
+      paint1,
+      animationValue * 2 * pi,
+      0.15,
+      waveHeight: 40,
+    );
+
+    // Second wave - medium
+    _drawWave(
+      canvas,
+      size,
+      paint2,
+      -animationValue * 2 * pi,
+      0.3,
+      waveHeight: 30,
+    );
+
+    // Third wave - fast
+    _drawWave(
+      canvas,
+      size,
+      paint3,
+      animationValue * 4 * pi,
+      0.45,
+      waveHeight: 50,
+    );
+  }
+
+  void _drawWave(
+    Canvas canvas,
+    Size size,
+    Paint paint,
+    double phase,
+    double verticalPosition, {
+    double waveHeight = 40,
+  }) {
+    final path = Path();
+    final baseY = size.height * verticalPosition;
+
+    path.moveTo(0, baseY);
+
+    for (double x = 0; x <= size.width; x += 5) {
+      final y = baseY + sin((x / size.width * 4 * pi) + phase) * waveHeight;
+      path.lineTo(x, y);
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant OnboardingWavePainter oldDelegate) {
+    return oldDelegate.animationValue != animationValue;
   }
 }

@@ -118,8 +118,12 @@ class EmailNotVerified extends AuthState {
 class RegistrationSuccess extends AuthState {
   final String email;
   final String userId;
-
-  const RegistrationSuccess({required this.email, required this.userId});
+  final String message;
+  const RegistrationSuccess({
+    required this.email,
+    required this.userId,
+    required this.message,
+  });
 
   @override
   List<Object> get props => [email, userId];
@@ -204,18 +208,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (result['success'] == true) {
         final user = result['user'] as User?;
         if (user?.emailConfirmedAt == null) {
-          emit(RegistrationSuccess(email: event.email, userId: user?.id ?? ''));
+          // Show email verification message
+          emit(
+            RegistrationSuccess(
+              email: event.email,
+              userId: user?.id ?? '',
+              message:
+                  'Registration successful! Please check your email to verify your account.',
+            ),
+          );
         } else {
           emit(AuthSuccess(result));
         }
       } else {
-        emit(AuthFailure(result['message']));
+        emit(AuthFailure(result['message'] ?? 'Registration failed'));
       }
+    } on AuthException catch (e) {
+      emit(AuthFailure('Auth error: ${e.message}'));
+    } on PostgrestException catch (e) {
+      emit(AuthFailure('Database error: ${e.message}'));
     } catch (e) {
       emit(AuthFailure('Registration failed: $e'));
     }
   }
 
+  // In your auth_bloc.dart, update the _onSignInWithEmail method
   Future<void> _onSignInWithEmail(
     SignInWithEmail event,
     Emitter<AuthState> emit,

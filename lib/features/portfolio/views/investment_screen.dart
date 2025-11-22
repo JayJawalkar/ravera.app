@@ -35,12 +35,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
     try {
       final repository = CoinDCXRepository();
       final data = await repository.fetchBitcoinHistoricalData();
-      print(data);
+     
       setState(() {
         _bitcoinHistoricalData = data;
       });
     } catch (e) {
-      print('Failed to load Bitcoin historical data: $e');
+      e.toString();
     }
   }
 
@@ -124,7 +124,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  border: Border.all(color: Colors.black.withAlpha(22)),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: IconButton(
@@ -137,7 +137,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  border: Border.all(color: Colors.black.withAlpha(22)),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: BlocBuilder<InvestmentBloc, InvestmentState>(
@@ -205,9 +205,9 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withAlpha(184),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.black.withOpacity(0.1)),
+              border: Border.all(color: Colors.black.withAlpha(22)),
             ),
             child: Column(
               children: [
@@ -215,7 +215,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
                   'Portfolio Value',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withAlpha(173),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -260,14 +260,14 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
                       Icon(
                         Icons.access_time,
                         size: 12,
-                        color: Colors.black.withOpacity(0.4),
+                        color: Colors.black.withAlpha(120),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Updated: ${state.lastUpdated}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.black.withOpacity(0.4),
+                          color: Colors.black.withAlpha(110),
                         ),
                       ),
                     ],
@@ -286,9 +286,9 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withAlpha(184),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withAlpha(22)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,7 +311,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
           Container(
             height: 120,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.black.withOpacity(0.1)),
+              border: Border.all(color: Colors.black.withAlpha(22)),
               borderRadius: BorderRadius.circular(8),
             ),
             child: _bitcoinHistoricalData.isNotEmpty
@@ -329,7 +329,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
                           'Loading Bitcoin data...',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.black.withOpacity(0.4),
+                            color: Colors.black.withAlpha(100),
                           ),
                         ),
                       ],
@@ -421,7 +421,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.black.withOpacity(0.6),
+                              color: Colors.black.withAlpha(156),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -473,9 +473,9 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withAlpha(184),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withAlpha(22)),
       ),
       child: Row(
         children: [
@@ -483,7 +483,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withAlpha(22),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Center(
@@ -510,7 +510,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen>
                   investment.symbol,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withAlpha(162),
                   ),
                 ),
               ],

@@ -16,7 +16,7 @@ class BitcoinChartWidget extends StatelessWidget {
       return Center(
         child: Text(
           'No data available',
-          style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.4)),
+          style: TextStyle(fontSize: 16, color: Colors.black.withAlpha(100)),
         ),
       );
     }
@@ -32,7 +32,7 @@ class BitcoinChartWidget extends StatelessWidget {
       return Center(
         child: Text(
           'No price data',
-          style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.4)),
+          style: TextStyle(fontSize: 16, color: Colors.black.withAlpha(100)),
         ),
       );
     }
@@ -95,7 +95,7 @@ class BitcoinChartWidget extends StatelessWidget {
       children: labels.map((label) {
         return Text(
           label,
-          style: TextStyle(fontSize: 10, color: Colors.black.withOpacity(0.6)),
+          style: TextStyle(fontSize: 10, color: Colors.black.withAlpha(165)),
         );
       }).toList(),
     );
@@ -131,7 +131,7 @@ class _BitcoinChartPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final fillPaint = Paint()
-      ..color = chartColor.withOpacity(0.15)
+      ..color = chartColor.withAlpha(29)
       ..style = PaintingStyle.fill;
 
     final dotPaint = Paint()
@@ -243,7 +243,7 @@ class _BitcoinChartPainter extends CustomPainter {
     canvas.drawRect(
       backgroundRect,
       Paint()
-        ..color = Colors.black.withOpacity(0.2)
+        ..color = Colors.black.withAlpha(45)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );

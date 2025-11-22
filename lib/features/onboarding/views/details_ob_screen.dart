@@ -1,110 +1,85 @@
 // details_screen.dart
 import 'package:flutter/material.dart';
 import 'package:ravera/constants/constants.dart';
+import 'package:ravera/features/auth/service/local_storage_service.dart';
 import 'package:ravera/features/auth/views/login_screen.dart';
+import 'package:ravera/features/onboarding/views/welcome_ob_screen.dart';
 
-class DetailsObScreen extends StatelessWidget {
+class DetailsObScreen extends StatefulWidget {
   const DetailsObScreen({super.key});
+
+  @override
+  State<DetailsObScreen> createState() => _DetailsObScreenState();
+}
+
+class _DetailsObScreenState extends State<DetailsObScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _waveController;
+
+  @override
+  void initState() {
+    super.initState();
+    _waveController = AnimationController(
+      duration: const Duration(seconds: 30),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _waveController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0F0F0F), Color(0xFF1A1A1A), Color(0xFF0A0A0A)],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Background elements
-            Positioned(
-              top: 100,
-              left: -30,
-              child: BlurContainer(
-                height: 120,
-                width: 120,
-                blur: 20,
-                bgColor: const Color(0xFFFFD700).withAlpha(15),
-                radius: 60,
-                child: const SizedBox(),
-              ),
-            ),
-            Positioned(
-              top: 200,
-              right: -40,
-              child: BlurContainer(
-                height: 100,
-                width: 100,
-                blur: 15,
-                bgColor: const Color(0xFFFFD700).withAlpha(25),
-                radius: 50,
-                child: const SizedBox(),
-              ),
-            ),
-            Positioned(
-              bottom: 150,
-              left: -20,
-              child: BlurContainer(
-                height: 80,
-                width: 80,
-                blur: 12,
-                bgColor: const Color(0xFFFFFFFF).withAlpha(15),
-                radius: 40,
-                child: const SizedBox(),
-              ),
-            ),
-            Positioned(
-              bottom: 300,
-              right: -10,
-              child: BlurContainer(
-                height: 60,
-                width: 60,
-                blur: 10,
-                bgColor: const Color(0xFFFFD700).withAlpha(20),
-                radius: 30,
-                child: const SizedBox(),
-              ),
-            ),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // Animated Wave Background
+          _buildWaveBackground(),
 
-            SingleChildScrollView(
+          // Main Content
+          SafeArea(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
                   SizedBox(height: height * 0.06),
 
                   // App Title Section
-                  BlurContainer(
+                  Container(
                     height: height * 0.25,
                     width: double.infinity,
-                    blur: 15,
-                    bgColor: Colors.white.withAlpha(12),
-                    radius: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(178),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.black.withAlpha(22)),
+                    ),
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
                           ImageConstants.selfhelp,
-                          height: 100,
-                          width: 100,
+                          height: 90,
+                          width: 90,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Ravera - Smart Savings',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           'Micro-investments made effortless',
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                          style: TextStyle(color: Colors.black54, fontSize: 14),
                         ),
                       ],
                     ),
@@ -113,12 +88,14 @@ class DetailsObScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Core Features Section
-                  BlurContainer(
+                  Container(
                     height: height * 0.46,
                     width: double.infinity,
-                    blur: 15,
-                    bgColor: Colors.white.withAlpha(10),
-                    radius: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(187),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.black.withAlpha(22)),
+                    ),
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +103,7 @@ class DetailsObScreen extends StatelessWidget {
                         Text(
                           'What We Do For You',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -138,7 +115,7 @@ class DetailsObScreen extends StatelessWidget {
                           title: 'Automated Round-Ups',
                           subtitle:
                               'Every purchase automatically rounds up and saves the spare change for your future',
-                          accentColor: const Color(0xFF4CAF50),
+                          accentColor: Colors.green,
                         ),
                         const SizedBox(height: 12),
 
@@ -147,7 +124,7 @@ class DetailsObScreen extends StatelessWidget {
                           title: 'Micro-Investments',
                           subtitle:
                               'Turn your small savings into diversified investments starting from just ₹10',
-                          accentColor: const Color(0xFF2196F3),
+                          accentColor: Colors.blue,
                         ),
                         const SizedBox(height: 12),
 
@@ -156,7 +133,7 @@ class DetailsObScreen extends StatelessWidget {
                           title: 'Smart Goal Setting',
                           subtitle:
                               'AI-powered recommendations help you set and achieve realistic financial goals',
-                          accentColor: const Color(0xFF9C27B0),
+                          accentColor: Colors.purple,
                         ),
                         const SizedBox(height: 12),
 
@@ -165,7 +142,7 @@ class DetailsObScreen extends StatelessWidget {
                           title: 'Bank-Grade Security',
                           subtitle:
                               'Your money is protected with encryption and regulatory compliance',
-                          accentColor: const Color(0xFFFF5722),
+                          accentColor: Colors.orange,
                         ),
                       ],
                     ),
@@ -174,12 +151,14 @@ class DetailsObScreen extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Benefits Section
-                  BlurContainer(
+                  Container(
                     height: height * 0.3,
                     width: double.infinity,
-                    blur: 10,
-                    bgColor: const Color(0xFFFFD700).withAlpha(15),
-                    radius: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withAlpha(10),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.black.withAlpha(22)),
+                    ),
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,14 +167,14 @@ class DetailsObScreen extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.star_outline,
-                              color: const Color(0xFFFFD700),
+                              color: Colors.black,
                               size: 24,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'Why Choose Ravera?',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -209,7 +188,7 @@ class DetailsObScreen extends StatelessWidget {
                           '• Gamified experience with rewards and achievement badges\n'
                           '• Emergency fund access when you need it most',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Colors.black54,
                             fontSize: 13,
                             height: 1.5,
                           ),
@@ -224,12 +203,16 @@ class DetailsObScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: BlurContainer(
+                        child: Container(
                           height: 80,
                           width: double.infinity,
-                          blur: 8,
-                          bgColor: Colors.white.withAlpha(8),
-                          radius: 12,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(185),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.black.withAlpha(22),
+                            ),
+                          ),
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -237,7 +220,7 @@ class DetailsObScreen extends StatelessWidget {
                               Text(
                                 '₹2,500',
                                 style: TextStyle(
-                                  color: const Color(0xFFFFD700),
+                                  color: Colors.black,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -246,8 +229,8 @@ class DetailsObScreen extends StatelessWidget {
                                 'Avg Monthly\nSavings',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 10,
+                                  color: Colors.black54,
+                                  fontSize: 8,
                                 ),
                               ),
                             ],
@@ -256,12 +239,16 @@ class DetailsObScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: BlurContainer(
+                        child: Container(
                           height: 80,
                           width: double.infinity,
-                          blur: 8,
-                          bgColor: Colors.white.withAlpha(8),
-                          radius: 12,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(187),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.black.withAlpha(22),
+                            ),
+                          ),
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -269,7 +256,7 @@ class DetailsObScreen extends StatelessWidget {
                               Text(
                                 '12%',
                                 style: TextStyle(
-                                  color: const Color(0xFFFFD700),
+                                  color: Colors.black,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -278,8 +265,8 @@ class DetailsObScreen extends StatelessWidget {
                                 'Average\nReturns',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 10,
+                                  color: Colors.black54,
+                                  fontSize: 8,
                                 ),
                               ),
                             ],
@@ -288,12 +275,16 @@ class DetailsObScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: BlurContainer(
+                        child: Container(
                           height: 80,
                           width: double.infinity,
-                          blur: 8,
-                          bgColor: Colors.white.withAlpha(8),
-                          radius: 12,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha(185),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.black.withAlpha(22),
+                            ),
+                          ),
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -301,7 +292,7 @@ class DetailsObScreen extends StatelessWidget {
                               Text(
                                 '50K+',
                                 style: TextStyle(
-                                  color: const Color(0xFFFFD700),
+                                  color: Colors.black,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -310,8 +301,8 @@ class DetailsObScreen extends StatelessWidget {
                                 'Happy\nUsers',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 10,
+                                  color: Colors.black54,
+                                  fontSize: 8,
                                 ),
                               ),
                             ],
@@ -327,8 +318,15 @@ class DetailsObScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        // Async call
+                        await LocalStorageService().setOnboardingCompleted();
+
+                        // Check if the widget is still mounted after async gap
+                        if (!context.mounted) return;
+
+                        // Now it's safe to use context
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => LoginScreen(),
@@ -337,13 +335,13 @@ class DetailsObScreen extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: const Color(0xFFFFD700),
-                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Start Saving Today',
                         style: TextStyle(
                           fontSize: 16,
@@ -357,9 +355,24 @@ class DetailsObScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildWaveBackground() {
+    return AnimatedBuilder(
+      animation: _waveController,
+      builder: (context, child) {
+        return CustomPaint(
+          size: Size(
+            MediaQuery.of(context).size.width,
+            MediaQuery.of(context).size.height,
+          ),
+          painter: OnboardingWavePainter(_waveController.value),
+        );
+      },
     );
   }
 
@@ -372,12 +385,14 @@ class DetailsObScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        BlurContainer(
+        Container(
           height: 45,
           width: 45,
-          blur: 8,
-          bgColor: accentColor.withAlpha(20),
-          radius: 12,
+          decoration: BoxDecoration(
+            color: accentColor.withAlpha(22),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.black.withAlpha(22)),
+          ),
           child: Icon(icon, color: accentColor, size: 20),
         ),
         const SizedBox(width: 16),
@@ -388,7 +403,7 @@ class DetailsObScreen extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
                 ),
@@ -397,7 +412,7 @@ class DetailsObScreen extends StatelessWidget {
               Text(
                 subtitle,
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: Colors.black54,
                   fontSize: 12,
                   height: 1.4,
                 ),

@@ -78,7 +78,6 @@ class CoinDCXRepository {
         );
       }
     } catch (e) {
-      print('Error fetching Bitcoin historical data: $e');
       // Fallback to mock historical data with proper current dates
       return _getMockHistoricalData();
     }

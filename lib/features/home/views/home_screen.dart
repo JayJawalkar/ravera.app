@@ -75,8 +75,8 @@ class _HomeScreenState extends State<HomeScreen>
               end: Alignment.bottomCenter,
               colors: [
                 Colors.white,
-                Colors.white.withOpacity(0.9),
-                Colors.white.withOpacity(0.8),
+                Colors.white.withAlpha(210),
+                Colors.white.withAlpha(190),
               ],
             ),
           ),
@@ -165,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen>
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  border: Border.all(color: Colors.black.withAlpha(22)),
                 ),
                 child: Icon(
                   Icons.notifications_outlined,
@@ -189,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen>
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.black.withAlpha(133),
             letterSpacing: 2.0,
           ),
         ),
@@ -218,22 +218,22 @@ class HomeWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint1 = Paint()
-      ..color = Colors.black.withOpacity(0.1)
+      ..color = Colors.black.withAlpha(22)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
     final paint2 = Paint()
-      ..color = Colors.black.withOpacity(0.08)
+      ..color = Colors.black.withAlpha(15)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
     final paint3 = Paint()
-      ..color = Colors.black.withOpacity(0.05)
+      ..color = Colors.black.withAlpha(10)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 
     final paint4 = Paint()
-      ..color = Colors.black.withOpacity(0.1)
+      ..color = Colors.black.withAlpha(22)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
